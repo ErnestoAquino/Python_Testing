@@ -7,3 +7,5 @@ tests/
 __pycache__
 
 env/
+.DS_Store
+.idea/
