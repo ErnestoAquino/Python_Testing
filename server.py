@@ -2,6 +2,7 @@ import json
 from flask import Flask, render_template, request, redirect, flash, url_for
 
 from constants import EMAIL_NOT_FOUND_ERROR
+from constants import EMAIL_EMPTY_ERROR
 
 
 def loadClubs():
@@ -30,6 +31,12 @@ def index():
 
 @app.route('/showSummary', methods=['POST'])
 def showSummary():
+    email = request.form.get('email')
+
+    if not email:
+        flash(EMAIL_EMPTY_ERROR)
+        return redirect(url_for('index'))
+
     try:
         club = [club for club in clubs if club['email'] == request.form['email']][0]
     except IndexError:
