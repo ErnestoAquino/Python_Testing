@@ -1,6 +1,8 @@
 import json
 from flask import Flask, render_template, request, redirect, flash, url_for
 
+from constants import EMAIL_NOT_FOUND_ERROR
+
 
 def loadClubs():
     with open('clubs.json') as c:
@@ -31,7 +33,7 @@ def showSummary():
     try:
         club = [club for club in clubs if club['email'] == request.form['email']][0]
     except IndexError:
-        flash("Sorry, that email was not found. Please try again.")
+        flash(EMAIL_NOT_FOUND_ERROR)
         return redirect(url_for('index'))
     return render_template('welcome.html', club=club, competitions=competitions)
 
