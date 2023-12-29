@@ -19,3 +19,25 @@ def test_clubs():
             "points": "10"
         }
     ]
+
+
+@pytest.fixture
+def mock_load_clubs():
+    return [
+        {
+            "name": "Test Club",
+            "email": "testclubmail@example.co",
+            "points": "10"
+        }
+    ]
+
+
+@pytest.fixture
+def mock_load_competitions():
+    return [
+        {
+            "name": "Test Competition",
+            "date": "2023-01-01",
+            "numberOfPlaces": "30"
+        }
+    ]
