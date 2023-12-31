@@ -10,6 +10,7 @@ from constants import INVALID_PLACES_MESSAGE
 from constants import NON_POSITIVE_PLACES_MESSAGE
 from constants import INVALID_POINTS_MESSAGE
 from constants import INVALID_CLUB_OR_COMPETITION
+from constants import MAX_PLACES_PER_BOOKING_MESSAGE
 
 
 def loadClubs():
@@ -101,6 +102,11 @@ def purchasePlaces():
         places_required = int(request.form['places'])
         if places_required <= 0:
             flash(NON_POSITIVE_PLACES_MESSAGE)
+            return redirect(url_for('book', competition=selected_competition['name'], club=selected_club['name']))
+
+        # Check that the number of places requested does not exceed 12.
+        if places_required > 12:
+            flash(MAX_PLACES_PER_BOOKING_MESSAGE)
             return redirect(url_for('book', competition=selected_competition['name'], club=selected_club['name']))
         points_to_use = places_required
     except ValueError:
