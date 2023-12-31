@@ -9,6 +9,7 @@ from constants import BOOKING_COMPLETE_MESSAGE
 from constants import INVALID_PLACES_MESSAGE
 from constants import NON_POSITIVE_PLACES_MESSAGE
 from constants import INVALID_POINTS_MESSAGE
+from constants import INVALID_CLUB_OR_COMPETITION
 
 
 def loadClubs():
@@ -35,6 +36,7 @@ def save_competitions(competition_list):
 
 app = Flask(__name__)
 app.secret_key = 'something_special'
+
 
 # competitions = loadCompetitions()
 # clubs = loadClubs()
@@ -80,8 +82,19 @@ def book(competition, club):
 def purchasePlaces():
     clubs = loadClubs()
     competitions = loadCompetitions()
-    selected_competition = [c for c in competitions if c['name'] == request.form['competition']][0]
-    selected_club = [c for c in clubs if c['name'] == request.form['club']][0]
+
+    # Get the data form the form.
+    competition_name = request.form.get('competition')
+    club_name = request.form.get('club')
+
+    # Search for the corresponding competition and club.
+    selected_competition = next((c for c in competitions if c['name'] == competition_name), None)
+    selected_club = next((c for c in clubs if c['name'] == club_name), None)
+
+    # Check if the competition and club were found.
+    if not selected_competition or not selected_club:
+        flash(INVALID_CLUB_OR_COMPETITION)
+        return redirect(url_for('index'))
 
     # Check that the number of places requested is valid.
     try:
