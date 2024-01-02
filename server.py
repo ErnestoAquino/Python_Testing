@@ -1,5 +1,6 @@
 import json
 from flask import Flask, render_template, request, redirect, flash, url_for
+from datetime import datetime
 
 from constants import EMAIL_NOT_FOUND_ERROR
 from constants import EMAIL_EMPTY_ERROR
@@ -11,6 +12,11 @@ from constants import NON_POSITIVE_PLACES_MESSAGE
 from constants import INVALID_POINTS_MESSAGE
 from constants import INVALID_CLUB_OR_COMPETITION
 from constants import MAX_PLACES_PER_BOOKING_MESSAGE
+from constants import INVALID_DATE_FORMAT_MESSAGE
+from constants import PAST_COMPETITION_BOOKING_ERROR_MESSAGE
+
+from utils import parse_competition_date
+from utils import is_competition_past
 
 
 def loadClubs():
@@ -96,6 +102,20 @@ def purchasePlaces():
     if not selected_competition or not selected_club:
         flash(INVALID_CLUB_OR_COMPETITION)
         return redirect(url_for('index'))
+
+    # Parse the competition date
+    competition_date = parse_competition_date(selected_competition['date'])
+    if competition_date is None:
+        flash(INVALID_DATE_FORMAT_MESSAGE)
+        return redirect(url_for('book', competition=selected_competition['name'], club=selected_club['name']))
+
+    # Get current date
+    current_date = datetime.now()
+
+    # Check if the competition has already passed.
+    if is_competition_past(competition_date, current_date):
+        flash(PAST_COMPETITION_BOOKING_ERROR_MESSAGE)
+        return redirect(url_for('book', competition=selected_competition['name'], club=selected_club['name']))
 
     # Check that the number of places requested is valid.
     try:
