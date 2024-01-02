@@ -91,7 +91,7 @@ def test_purchase_places_when_insufficient_places(client, mocker, mock_load_club
     insufficient_places_competitions = [
         {
             "name": "Test Competition",
-            "date": "2023-01-01",
+            "date": "2050-10-22 13:30:00",
             "numberOfPlaces": "2"  # Insufficient places for purchase
         }
     ]
