@@ -266,6 +266,7 @@ def test_purchase_places_with_past_competition(client, mocker, mock_load_clubs):
 
 
 def test_purchase_places_with_invalid_competition_date_format(client, mocker, mock_load_clubs):
+    # Test: Attempt to purchase places for a competition with an invalid date format.
     invalid_format_competition = [
         {
             "name": "Test Competition",
