@@ -7,6 +7,8 @@ from constants import INVALID_PLACES_MESSAGE
 from constants import NON_POSITIVE_PLACES_MESSAGE
 from constants import INVALID_CLUB_OR_COMPETITION
 from constants import MAX_PLACES_PER_BOOKING_MESSAGE
+from constants import PAST_COMPETITION_BOOKING_ERROR_MESSAGE
+from constants import INVALID_DATE_FORMAT_MESSAGE
 
 
 # -------------------------------------------------------
@@ -213,3 +215,74 @@ def test_purchase_places_exceeding_place_limit(client, mocker, mock_load_clubs, 
 
     assert response.status_code == 200
     assert MAX_PLACES_PER_BOOKING_MESSAGE.encode() in response.data
+
+
+def test_purchase_places_with_future_competition(client, mocker, mock_load_clubs):
+    # Test: Attempt to purchase places for a competition set in the future.
+    future_competition = [
+        {
+            "name": "Test Competition",
+            "date": "2100-10-22 13:30:00",  # Future date
+            "numberOfPlaces": "20"
+        }
+    ]
+    mocker.patch('server.loadClubs', return_value=mock_load_clubs)
+    mocker.patch('server.loadCompetitions', return_value=future_competition)
+    mocker.patch('server.save_clubs')
+    mocker.patch('server.save_competitions')
+
+    response = client.post('/purchasePlaces', data={
+        'competition': "Test Competition",
+        'club': "Test Club",
+        'places': "1"
+    }, follow_redirects=True)
+
+    assert response.status_code == 200
+    assert BOOKING_COMPLETE_MESSAGE.encode() in response.data
+
+
+def test_purchase_places_with_past_competition(client, mocker, mock_load_clubs):
+    # Test: Attempt to purchase places for a competition that has already occurred in the past.
+    past_competition = [
+        {
+            "name": "Test Competition",
+            "date": "2000-10-22 13:30:00",  # Past date
+            "numberOfPlaces": "20"
+        }
+    ]
+    mocker.patch('server.loadClubs', return_value=mock_load_clubs)
+    mocker.patch('server.loadCompetitions', return_value=past_competition)
+    mocker.patch('server.save_clubs')
+    mocker.patch('server.save_competitions')
+
+    response = client.post('/purchasePlaces', data={
+        'competition': "Test Competition",
+        'club': "Test Club",
+        'places': "1"
+    }, follow_redirects=True)
+
+    assert response.status_code == 200
+    assert PAST_COMPETITION_BOOKING_ERROR_MESSAGE.encode() in response.data
+
+
+def test_purchase_places_with_invalid_competition_date_format(client, mocker, mock_load_clubs):
+    invalid_format_competition = [
+        {
+            "name": "Test Competition",
+            "date": "this is not a date",  # Invalid format
+            "numberOfPlaces": "20"
+        }
+    ]
+    mocker.patch('server.loadClubs', return_value=mock_load_clubs)
+    mocker.patch('server.loadCompetitions', return_value=invalid_format_competition)
+    mocker.patch('server.save_clubs')
+    mocker.patch('server.save_competitions')
+
+    response = client.post('/purchasePlaces', data={
+        'competition': "Test Competition",
+        'club': "Test Club",
+        'places': "1"
+    }, follow_redirects=True)
+
+    assert response.status_code == 200
+    assert INVALID_DATE_FORMAT_MESSAGE.encode() in response.data
