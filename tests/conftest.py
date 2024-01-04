@@ -41,3 +41,27 @@ def mock_load_competitions():
             "numberOfPlaces": "30"
         }
     ]
+
+
+class MockSaveFunction:
+    # A mock class designed to simulate a save function. It stores the last argument passed to it, allowing tests to
+    # verify if data was correctly passed to the mock function.
+    def __init__(self):
+        self.last_call_arg = None
+
+    def __call__(self, data):
+        self.last_call_arg = data
+
+
+@pytest.fixture
+def mock_save_clubs():
+    # A mock class designed to simulate a save function. It stores the last argument passed to it, allowing tests to
+    # verify if data was correctly passed to the mock function.
+    return MockSaveFunction()
+
+
+@pytest.fixture
+def mock_save_competitions():
+    # A pytest fixture that returns a mock save function specifically for competitions. This fixture is used to
+    # simulate saving competition data in tests and to check the data passed to the save function.
+    return MockSaveFunction()
