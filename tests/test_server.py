@@ -287,3 +287,131 @@ def test_purchase_places_with_invalid_competition_date_format(client, mocker, mo
 
     assert response.status_code == 200
     assert INVALID_DATE_FORMAT_MESSAGE.encode() in response.data
+
+# -------------------------------------------------------
+# Tests for purchasePlaces Function: Bug point update fix
+# -------------------------------------------------------
+
+
+def test_correct_point_deduction(client, mocker, mock_save_clubs, mock_save_competitions):
+    # Test: Verify correct point deduction after a club purchases places in a competition.
+
+    initial_points = 15  # Initial points of the club
+    places_to_purchase = 5  # Number of places to purchase
+    expected_points_after_purchase = initial_points - places_to_purchase  # Expected points after purchase
+
+    mock_club = [
+        {
+            "name": "Test Club",
+            "email": "testclubmail@example.co",
+            "points": str(initial_points)  # Convert to string to simulate input data
+        }
+    ]
+
+    mock_competition = [
+        {
+            "name": "Test Competition",
+            "date": "2050-10-22 13:30:00",
+            "numberOfPlaces": "20"
+        }
+    ]
+    mocker.patch('server.loadClubs', return_value=mock_club)
+    mocker.patch('server.loadCompetitions', return_value=mock_competition)
+    mocker.patch('server.save_clubs', mock_save_clubs)
+    mocker.patch('server.save_competitions', mock_save_competitions)
+
+    # Perform the POST request
+    response = client.post('/purchasePlaces', data={
+        'competition': "Test Competition",
+        'club': "Test Club",
+        'places': str(places_to_purchase)
+    })
+
+    # Verify results
+    assert response.status_code == 200
+    assert BOOKING_COMPLETE_MESSAGE.encode() in response.data
+
+    # Check that save_clubs was called with the updated points
+    assert mock_save_clubs.last_call_arg[0]['points'] == str(expected_points_after_purchase)
+
+
+def test_no_point_deduction_for_invalid_purchase(client, mocker, mock_save_clubs, mock_save_competitions):
+    # Test: Ensure that no points are deducted from a club's total for an invalid purchase attempt
+    # due to insufficient points
+
+    initial_points = 3  # Initial points of the club, not enough for purchase
+    places_to_purchase = 5  # Number of places to attempt to purchase
+
+    mock_club = [
+        {
+            "name": "Test Club",
+            "email": "testclubmail@example.co",
+            "points": str(initial_points)  # Convert to string to simulate input data
+        }
+    ]
+    mock_competition = [
+        {
+            "name": "Test Competition",
+            "date": "2050-10-22 13:30:00",
+            "numberOfPlaces": "20"
+        }
+    ]
+    mocker.patch('server.loadClubs', return_value=mock_club)
+    mocker.patch('server.loadCompetitions', return_value=mock_competition)
+    mocker.patch('server.save_clubs', mock_save_clubs)
+    mocker.patch('server.save_competitions', mock_save_competitions)
+
+    # Perform the POST request
+    response = client.post('/purchasePlaces', data={
+        'competition': "Test Competition",
+        'club': "Test Club",
+        'places': str(places_to_purchase)
+    }, follow_redirects=True)
+
+    # Verify results
+    assert response.status_code == 200
+    assert INSUFFICIENT_POINTS_MESSAGE.encode() in response.data
+
+    # Verify that the save_club function was not called to ensure that the club's points were not modified
+    assert mock_save_clubs.last_call_arg is None
+
+
+def test_point_deduction_for_max_place_purchase(client, mocker, mock_save_clubs, mock_save_competitions):
+    initial_points = 20
+    max_places_to_purchase = 12
+    expected_points_after_purchase = initial_points - max_places_to_purchase
+
+    mock_club = [
+        {
+            "name": "Test Club",
+            "email": "testclubmail@example.co",
+            "points": str(initial_points)  # Convert to string to simulate input data
+        }
+    ]
+
+    mock_competition = [
+        {
+            "name": "Test Competition",
+            "date": "2050-10-22 13:30:00",
+            "numberOfPlaces": "30"  # Sufficient availability of places
+        }
+    ]
+
+    mocker.patch('server.loadClubs', return_value=mock_club)
+    mocker.patch('server.loadCompetitions', return_value=mock_competition)
+    mocker.patch('server.save_clubs', mock_save_clubs)
+    mocker.patch('server.save_competitions', mock_save_competitions)
+
+    # Perform the POST request to purchase the maximum number of places
+    response = client.post('/purchasePlaces', data={
+        'competition': "Test Competition",
+        'club': "Test Club",
+        'places': str(max_places_to_purchase)
+    }, follow_redirects=True)
+
+    # Verify results
+    assert response.status_code == 200
+    assert BOOKING_COMPLETE_MESSAGE.encode() in response.data
+
+    # Verify that save_clubs was called with the updated points
+    assert mock_save_clubs.last_call_arg[0]['points'] == str(expected_points_after_purchase)
