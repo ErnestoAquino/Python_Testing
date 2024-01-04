@@ -154,8 +154,8 @@ def purchasePlaces():
         return redirect(url_for('book', competition=selected_competition['name'], club=selected_club['name']))
 
     # If the checks are correct, we update the points and places.
-    selected_club['points'] = available_points - points_to_use
-    selected_competition['numberOfPlaces'] = number_of_places - places_required
+    selected_club['points'] = str(available_points - points_to_use)
+    selected_competition['numberOfPlaces'] = str(number_of_places - places_required)
 
     save_clubs(clubs)
     save_competitions(competitions)
