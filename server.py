@@ -1,4 +1,3 @@
-import json
 from flask import Flask, render_template, request, redirect, flash, url_for
 from datetime import datetime
 
@@ -14,39 +13,18 @@ from constants import INVALID_CLUB_OR_COMPETITION
 from constants import MAX_PLACES_PER_BOOKING_MESSAGE
 from constants import INVALID_DATE_FORMAT_MESSAGE
 from constants import PAST_COMPETITION_BOOKING_ERROR_MESSAGE
+from constants import LOADING_MESSAGE_ERROR
 
 from utils import parse_competition_date
 from utils import is_competition_past
 
-
-def loadClubs():
-    with open('clubs.json') as c:
-        list_of_clubs = json.load(c)['clubs']
-        return list_of_clubs
-
-
-def loadCompetitions():
-    with open('competitions.json') as comps:
-        list_of_competitions = json.load(comps)['competitions']
-        return list_of_competitions
-
-
-def save_clubs(club_list):
-    with open('clubs.json', 'w') as c:
-        json.dump({"clubs": club_list}, c, indent=4)
-
-
-def save_competitions(competition_list):
-    with open('competitions.json', 'w') as comps:
-        json.dump({"competitions": competition_list}, comps, indent=4)
-
+from data_access import loadClubs
+from data_access import loadCompetitions
+from data_access import save_clubs
+from data_access import save_competitions
 
 app = Flask(__name__)
 app.secret_key = 'something_special'
-
-
-# competitions = loadCompetitions()
-# clubs = loadClubs()
 
 
 @app.route('/')
@@ -60,13 +38,19 @@ def showSummary():
     clubs = loadClubs()
     competitions = loadCompetitions()
 
+    # Verify if the clubs and competitions data were loaded correctly
+    if not clubs or not competitions:
+        flash(LOADING_MESSAGE_ERROR)
+        return redirect(url_for('index'))
+
+    # Verify if an email has been provided
     if not email:
         flash(EMAIL_EMPTY_ERROR)
         return redirect(url_for('index'))
 
-    try:
-        club = [club for club in clubs if club['email'] == request.form['email']][0]
-    except IndexError:
+    # Search for the club corresponding to the provided email
+    club = next((c for c in clubs if c['email'] == email), None)
+    if not club:
         flash(EMAIL_NOT_FOUND_ERROR)
         return redirect(url_for('index'))
     return render_template('welcome.html', club=club, competitions=competitions)
