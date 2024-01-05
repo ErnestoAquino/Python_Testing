@@ -153,7 +153,12 @@ def purchasePlaces():
         flash(SAVE_CHANGES_MESSAGE_ERROR)
         return redirect(url_for('book', competition=selected_competition['name'], club=selected_club['name']))
 
+    # Generate and display the confirmation message
+    booking_confirmation_message = (f"You have reserved {places_required} place(s) for the competition"
+                                    f" {selected_competition['name']}.")
     flash(BOOKING_COMPLETE_MESSAGE)
+    flash(booking_confirmation_message)
+
     return render_template('welcome.html', club=selected_club, competitions=competitions)
 
 
