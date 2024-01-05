@@ -10,6 +10,7 @@ from constants import MAX_PLACES_PER_BOOKING_MESSAGE
 from constants import PAST_COMPETITION_BOOKING_ERROR_MESSAGE
 from constants import INVALID_DATE_FORMAT_MESSAGE
 from constants import LOADING_MESSAGE_ERROR
+from constants import SAVE_CHANGES_MESSAGE_ERROR
 
 
 # -------------------------------------------------------
@@ -429,3 +430,37 @@ def test_point_deduction_for_max_place_purchase(client, mocker, mock_save_clubs,
 
     # Verify that save_clubs was called with the updated points
     assert mock_save_clubs.last_call_arg[0]['points'] == str(expected_points_after_purchase)
+
+
+def test_save_error_handling_places(client, mocker, mock_save_clubs_fail, mock_save_competitions_fail):
+    #  Test: Verify the server's error handling when there's a failure in saving changes after a purchase.
+
+    mock_competition = [
+        {
+            "name": "Test Competition",
+            "date": "2100-10-22 13:30:00",
+            "numberOfPlaces": "15"
+        }
+    ]
+
+    mock_club = [
+        {
+            "name": "Test Club",
+            "email": "testclubmail@example.co",
+            "points": "20"
+        }
+    ]
+
+    mocker.patch('server.loadClubs', return_value=mock_club)
+    mocker.patch('server.loadCompetitions', return_value=mock_competition)
+    mocker.patch('server.save_clubs', mock_save_clubs_fail)
+    mocker.patch('server.save_competitions', mock_save_competitions_fail)
+
+    response = client.post('/purchasePlaces', data={
+        'competition': "Test Competition",
+        'club': "Test Club",
+        'places': "5"
+    }, follow_redirects=True)
+
+    assert response.status_code == 200
+    assert SAVE_CHANGES_MESSAGE_ERROR.encode() in response.data
