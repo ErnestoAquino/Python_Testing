@@ -455,8 +455,8 @@ def test_save_error_handling_places(client, mocker, mock_save_clubs_fail, mock_s
         }
     ]
 
-    mocker.patch('server.loadClubs', return_value = mock_club)
-    mocker.patch('server.loadCompetitions', return_value = mock_competition)
+    mocker.patch('server.loadClubs', return_value=mock_club)
+    mocker.patch('server.loadCompetitions', return_value=mock_competition)
     mocker.patch('server.save_clubs', mock_save_clubs_fail)
     mocker.patch('server.save_competitions', mock_save_competitions_fail)
 
