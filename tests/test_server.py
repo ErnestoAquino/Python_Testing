@@ -9,6 +9,7 @@ from constants import INVALID_CLUB_OR_COMPETITION
 from constants import MAX_PLACES_PER_BOOKING_MESSAGE
 from constants import PAST_COMPETITION_BOOKING_ERROR_MESSAGE
 from constants import INVALID_DATE_FORMAT_MESSAGE
+from constants import LOADING_MESSAGE_ERROR
 
 
 # -------------------------------------------------------
@@ -40,6 +41,18 @@ def test_show_summary_with_empty_email(client):
     response = client.post('/showSummary', data={'email': ''}, follow_redirects=True)
     assert response.status_code == 200
     assert EMAIL_EMPTY_ERROR.encode() in response.data
+
+
+def test_show_summary_with_loading_error(client, mocker, test_clubs):
+    # Test: Simulate an error in loading clubs or competitions data. This should show a loading error message.
+    mocker.patch('server.loadClubs', return_value=[])  # Simulates that the loading of clubs data fails
+    mocker.patch('server.loadCompetitions', return_value=[])  # Simulates that the loading of competitions data fails
+    valid_email = test_clubs[0]['email']
+
+    response = client.post('/showSummary', data={'email': valid_email}, follow_redirects=True)
+
+    assert response.status_code == 200
+    assert LOADING_MESSAGE_ERROR.encode() in response.data
 
 
 # -------------------------------------------------------
@@ -287,6 +300,7 @@ def test_purchase_places_with_invalid_competition_date_format(client, mocker, mo
 
     assert response.status_code == 200
     assert INVALID_DATE_FORMAT_MESSAGE.encode() in response.data
+
 
 # -------------------------------------------------------
 # Tests for purchasePlaces Function: Bug point update fix
