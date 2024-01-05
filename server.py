@@ -14,6 +14,7 @@ from constants import MAX_PLACES_PER_BOOKING_MESSAGE
 from constants import INVALID_DATE_FORMAT_MESSAGE
 from constants import PAST_COMPETITION_BOOKING_ERROR_MESSAGE
 from constants import LOADING_MESSAGE_ERROR
+from constants import SAVE_CHANGES_MESSAGE_ERROR
 
 from utils import parse_competition_date
 from utils import is_competition_past
@@ -73,6 +74,11 @@ def book(competition, club):
 def purchasePlaces():
     clubs = loadClubs()
     competitions = loadCompetitions()
+
+    # Verify if the clubs and competitions were loaded correctly.
+    if not clubs or not competitions:
+        flash(LOADING_MESSAGE_ERROR)
+        return redirect(url_for('index'))
 
     # Get the data form the form.
     competition_name = request.form.get('competition')
@@ -141,8 +147,11 @@ def purchasePlaces():
     selected_club['points'] = str(available_points - points_to_use)
     selected_competition['numberOfPlaces'] = str(number_of_places - places_required)
 
-    save_clubs(clubs)
-    save_competitions(competitions)
+    # Save changes if all checks are correct
+    save_success = save_clubs(clubs) and save_competitions(competitions)
+    if not save_success:
+        flash(SAVE_CHANGES_MESSAGE_ERROR)
+        return redirect(url_for('book', competition=selected_competition['name'], club=selected_club['name']))
 
     flash(BOOKING_COMPLETE_MESSAGE)
     return render_template('welcome.html', club=selected_club, competitions=competitions)
