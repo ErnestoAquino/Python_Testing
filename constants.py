@@ -1,5 +1,6 @@
 EMAIL_NOT_FOUND_ERROR = "Sorry, that email was not found. Please try again."
 EMAIL_EMPTY_ERROR = "Please introduce an email."
+LOADING_MESSAGE_ERROR = "An error occurred while loading data. Please try again."
 
 # Messages for purchase places
 INSUFFICIENT_POINTS_MESSAGE = "You do not have enough points to reserve these places."
