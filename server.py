@@ -15,6 +15,7 @@ from constants import INVALID_DATE_FORMAT_MESSAGE
 from constants import PAST_COMPETITION_BOOKING_ERROR_MESSAGE
 from constants import LOADING_MESSAGE_ERROR
 from constants import SAVE_CHANGES_MESSAGE_ERROR
+from constants import COMPETITION_FULL_MESSAGE
 
 from utils import parse_competition_date
 from utils import is_competition_past
@@ -139,6 +140,11 @@ def purchasePlaces():
     except ValueError:
         flash('Invalid number of places')
         return redirect(url_for('book', competition=selected_competition['name'], club=selected_club['name']))
+    # Check if the competition is already full
+    if number_of_places <= 0:
+        flash(COMPETITION_FULL_MESSAGE)
+        return redirect(url_for('book', competition=selected_competition['name'], club=selected_club['name']))
+
     if number_of_places < points_to_use:
         flash(INSUFFICIENT_PLACES_MESSAGE)
         return redirect(url_for('book', competition=selected_competition['name'], club=selected_club['name']))
