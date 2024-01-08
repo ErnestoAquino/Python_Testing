@@ -1,3 +1,4 @@
+import server
 from constants import EMAIL_NOT_FOUND_ERROR
 from constants import EMAIL_EMPTY_ERROR
 from constants import BOOKING_COMPLETE_MESSAGE
@@ -498,3 +499,34 @@ def test_purchase_places_competition_full(client, mocker, mock_load_clubs):
     # Verify the results
     assert response.status_code == 200
     assert COMPETITION_FULL_MESSAGE.encode() in response.data
+
+
+# -------------------------------------------------------
+# Tests for club_points Function
+# -------------------------------------------------------
+
+
+def test_club_points_page_loads(client, mocker, test_clubs):
+    # Test: Verify that the club points page loads successfully.
+    mocker.patch('server.loadClubs', return_value=test_clubs)
+    response = client.get('/club-points')
+
+    assert response.status_code == 200
+    assert b"Club Points" in response.data
+
+
+def test_club_points_display(client, mocker, test_clubs):
+    # Test: Verify that the club points are correctly displayed on the page.
+    mocker.patch('server.loadClubs', return_value=test_clubs)
+    response = client.get('/club-points')
+    for club in test_clubs:
+        assert club['name'].encode() in response.data
+        assert club['points'].encode() in response.data
+
+
+def test_club_points_page_loading_error(client, mocker):
+    # Test: Simulate a loading error and verify that an error message is displayed.
+    mocker.patch('server.loadClubs', return_value=[])  # Simulate a loading error.
+    response = client.get('/club-points', follow_redirects=True)
+    assert response.status_code == 200
+    assert LOADING_MESSAGE_ERROR.encode() in response.data
