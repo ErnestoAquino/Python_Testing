@@ -11,6 +11,7 @@ from constants import PAST_COMPETITION_BOOKING_ERROR_MESSAGE
 from constants import INVALID_DATE_FORMAT_MESSAGE
 from constants import LOADING_MESSAGE_ERROR
 from constants import SAVE_CHANGES_MESSAGE_ERROR
+from constants import COMPETITION_FULL_MESSAGE
 
 
 # -------------------------------------------------------
@@ -468,3 +469,32 @@ def test_save_error_handling_places(client, mocker, mock_save_clubs_fail, mock_s
 
     assert response.status_code == 200
     assert SAVE_CHANGES_MESSAGE_ERROR.encode() in response.data
+
+
+def test_purchase_places_competition_full(client, mocker, mock_load_clubs):
+    # Test: Attempt to purchase places in a competition that is already full.
+
+    # Setting up a full competition
+    full_competition = [
+        {
+            "name": "Full Competition",
+            "date": "2050-10-22 13:30:00",
+            "numberOfPlaces": "0"  # No places available
+        }
+    ]
+
+    mocker.patch('server.loadClubs', return_value=mock_load_clubs)
+    mocker.patch('server.loadCompetitions', return_value=full_competition)
+    mocker.patch('server.save_clubs')
+    mocker.patch('server.save_competitions')
+
+    # Perform POST request to try purchasing places in the full competition
+    response = client.post('/purchasePlaces', data={
+        "competition": "Full Competition",
+        "club": "Test Club",
+        "places": "1"
+    }, follow_redirects=True)
+
+    # Verify the results
+    assert response.status_code == 200
+    assert COMPETITION_FULL_MESSAGE.encode() in response.data
