@@ -1,0 +1,22 @@
+/* General styles for the body */
+body {
+    font-family: Arial, sans-serif;
+}
+
+/* Styles for table */
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+/* Styles for table cells and headers */
+th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+/* Styles for table header */
+th {
+    background-color: #f2f2f2;
+}
