@@ -548,23 +548,35 @@ def test_logout(client):
 # -------------------------------------------------------
 # Test for book Function
 # -------------------------------------------------------
-def test_book_club_or_competition_not_found(client, mocker, test_clubs):
+def test_book_club_and_competition_found(client, mocker, mock_load_clubs, mock_load_competitions):
+    # Test:Verify that booking page loads successfully when both club and competition are found.
+
+    # Use existing club and competition names
+    existing_club_name = "Test Club"
+    existing_competition_name = "Test Competition"
+
+    mocker.patch('server.loadClubs', return_value=mock_load_clubs)
+    mocker.patch('server.loadCompetitions', return_value=mock_load_competitions)
+
+    # Attempt to book for an existing club and competition.
+    response = client.get(f'/book/{existing_competition_name}/{existing_club_name}')
+
+    assert response.status_code == 200
+    assert existing_competition_name.encode() in response.data  # Verify that the competition name is in the response
+    assert b'How many places?' in response.data
+
+
+def test_book_club_or_competition_not_found(client, mocker, mock_load_clubs, mock_load_competitions):
     # Test: Verify that booking fails and redirects with an error when club or competition is not found.
 
-    # Mock data
-    competition = [
-        {
-            "name": "Full Competition",
-            "date": "2050-10-22 13:30:00",
-            "numberOfPlaces": "30"
-        }
-    ]
+    nonexisting_club_name = "Non Existing Competition"
+    nonexisting_competition_name = "Non Existing Competition"
 
-    mocker.patch('server.loadClubs', return_value=test_clubs)
-    mocker.patch('server.loadCompetitions', return_value=competition)
+    mocker.patch('server.loadClubs', return_value=mock_load_clubs)
+    mocker.patch('server.loadCompetitions', return_value=mock_load_competitions)
 
     # Attempt to book for a club and competition that do not exist in the mock data.
-    response = client.get('/book/Noexisting Competition/Noexisting Club', follow_redirects=True)
+    response = client.get(f'/book/{nonexisting_club_name}/{nonexisting_club_name}', follow_redirects=True)
 
     # Check that the response is a redirect to the welcome page with an error message.
     assert response.status_code == 200
