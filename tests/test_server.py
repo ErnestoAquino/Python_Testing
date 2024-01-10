@@ -17,6 +17,56 @@ from constants import ERROR_MESSAGE_RETRY
 
 
 # -------------------------------------------------------
+# Tests for flow
+# -------------------------------------------------------
+def test_integration_flow(client, mocker, mock_load_clubs, mock_load_competitions, mock_save_clubs,
+                          mock_save_competitions):
+    # Test: This integration test simulates a complete user journey through the web application. It includes visiting
+    # the home page, displaying the summary page for a club, booking places in a competition, completing a purchase,
+    # and finally logging out. This test ensures that each step in the flow works as expected and the system responds
+    # correctly at each stage.
+
+    existing_mail = "testclubmail@example.co"
+    existing_club = "Test Club"
+    existing_competition = "Test Competition"
+    expected_confirmation_message = "You have reserved 5 place(s) for the competition Test Competition."
+
+    # Mock the loadsClubs y loadCompetitions functions
+    mocker.patch('server.loadClubs', return_value=mock_load_clubs)
+    mocker.patch('server.loadCompetitions', return_value=mock_load_competitions)
+    mocker.patch('server.save_clubs', mock_save_clubs)
+    mocker.patch('server.save_competitions', mock_save_competitions)
+
+    # index: GET request to the root route
+    response = client.get('/')
+    assert response.status_code == 200
+
+    # showSummary: POST request
+    response = client.post('/showSummary', data={'email': existing_mail})
+    assert response.status_code == 200
+
+    # book: GET request to the booking route for a specific club and competition
+    response = client.get(f'/book/{existing_competition}/{existing_club}')
+    assert response.status_code == 200
+
+    # purchasePlaces: POST request to make a purchase
+    response = client.post('/purchasePlaces', data={
+        'competition': "Test Competition",
+        'club': "Test Club",
+        'places': "5"
+    })
+
+    assert response.status_code == 200
+    assert BOOKING_COMPLETE_MESSAGE.encode() in response.data
+    assert expected_confirmation_message.encode() in response.data
+
+    # logout: GET request to the logout route
+    response = client.get('/logout', follow_redirects=True)
+    assert response.status_code == 200
+    assert b'Welcome' in response.data
+
+
+# -------------------------------------------------------
 # Tests for showSummary Function
 # -------------------------------------------------------
 
@@ -581,5 +631,3 @@ def test_book_club_or_competition_not_found(client, mocker, mock_load_clubs, moc
     # Check that the response is a redirect to the welcome page with an error message.
     assert response.status_code == 200
     assert ERROR_MESSAGE_RETRY.encode() in response.data
-
-
