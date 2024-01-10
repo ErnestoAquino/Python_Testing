@@ -13,6 +13,7 @@ from constants import INVALID_DATE_FORMAT_MESSAGE
 from constants import LOADING_MESSAGE_ERROR
 from constants import SAVE_CHANGES_MESSAGE_ERROR
 from constants import COMPETITION_FULL_MESSAGE
+from constants import ERROR_MESSAGE_RETRY
 
 
 # -------------------------------------------------------
@@ -530,3 +531,43 @@ def test_club_points_page_loading_error(client, mocker):
     response = client.get('/club-points', follow_redirects=True)
     assert response.status_code == 200
     assert LOADING_MESSAGE_ERROR.encode() in response.data
+
+
+# -------------------------------------------------------
+# Test for logout Function
+# -------------------------------------------------------
+
+def test_logout(client):
+    # Test: Verify the logout route redirects to the index
+    response = client.get('/logout', follow_redirects=True)
+
+    assert response.status_code == 200
+    assert b'Welcome' in response.data
+
+
+# -------------------------------------------------------
+# Test for book Function
+# -------------------------------------------------------
+def test_book_club_or_competition_not_found(client, mocker, test_clubs):
+    # Test: Verify that booking fails and redirects with an error when club or competition is not found.
+
+    # Mock data
+    competition = [
+        {
+            "name": "Full Competition",
+            "date": "2050-10-22 13:30:00",
+            "numberOfPlaces": "30"
+        }
+    ]
+
+    mocker.patch('server.loadClubs', return_value=test_clubs)
+    mocker.patch('server.loadCompetitions', return_value=competition)
+
+    # Attempt to book for a club and competition that do not exist in the mock data.
+    response = client.get('/book/Noexisting Competition/Noexisting Club', follow_redirects=True)
+
+    # Check that the response is a redirect to the welcome page with an error message.
+    assert response.status_code == 200
+    assert ERROR_MESSAGE_RETRY.encode() in response.data
+
+
