@@ -16,6 +16,7 @@ from constants import PAST_COMPETITION_BOOKING_ERROR_MESSAGE
 from constants import LOADING_MESSAGE_ERROR
 from constants import SAVE_CHANGES_MESSAGE_ERROR
 from constants import COMPETITION_FULL_MESSAGE
+from constants import ERROR_MESSAGE_RETRY
 
 from utils import parse_competition_date
 from utils import is_competition_past
@@ -62,13 +63,16 @@ def showSummary():
 def book(competition, club):
     clubs = loadClubs()
     competitions = loadCompetitions()
-    foundClub = [c for c in clubs if c['name'] == club][0]
-    foundCompetition = [c for c in competitions if c['name'] == competition][0]
-    if foundClub and foundCompetition:
-        return render_template('booking.html', club=foundClub, competition=foundCompetition)
+
+    # Search for the corresponding competition and club
+    found_club = next((c for c in clubs if c['name'] == club), None)
+    found_competition = next((c for c in competitions if c['name'] == competition), None)
+
+    if found_club and found_competition:
+        return render_template('booking.html', club=found_club, competition=found_competition)
     else:
-        flash("Something went wrong-please try again")
-        return render_template('welcome.html', club=club, competitions=competitions)
+        flash(ERROR_MESSAGE_RETRY)
+        return render_template('welcome.html', club=club, competition=competitions)
 
 
 @app.route('/purchasePlaces', methods=['POST'])
