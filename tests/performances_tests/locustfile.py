@@ -34,7 +34,8 @@ class ClubUserBehavior(TaskSet):
         self.client.get("/logout")
 
 
+# Defines the behavior for a website user
 class WebsiteUser(HttpUser):
-    host = "http://127.0.0.1:5000"
-    tasks = [ClubUserBehavior]
-    wait_time = between(1, 5)
+    host = "http://127.0.0.1:5000"  # The host URL where the Flask application is running
+    tasks = [ClubUserBehavior]  # Assigning the defined user behavior
+    wait_time = between(1, 5)   # Setting a random wait time between tasks
