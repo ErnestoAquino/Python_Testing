@@ -1,7 +1,12 @@
+import os
 import json
 
 
-def loadClubs(file_path='clubs.json'):
+def loadClubs():
+    env = os.getenv('FLASK_ENV', 'production')
+    file_path = 'data/production/clubs.json' if env == 'production' \
+        else 'data/test/clubs_test.json'
+
     try:
         with open(file_path, 'r') as c:
             list_of_clubs = json.load(c)['clubs']
@@ -11,7 +16,10 @@ def loadClubs(file_path='clubs.json'):
         return []  # Return an empty list in case of error.
 
 
-def loadCompetitions(file_path='competitions.json'):
+def loadCompetitions():
+    env = os.getenv('FLASK_ENV', 'production')
+    file_path = 'data/production/competitions.json' if env == 'production' \
+        else 'data/test/competitions_test.json'
     try:
         with open(file_path, 'r') as c:
             list_of_competitions = json.load(c)['competitions']
@@ -21,7 +29,11 @@ def loadCompetitions(file_path='competitions.json'):
         return []  # Return an empty list in case of error.
 
 
-def save_clubs(clubs_list, file_path='clubs.json') -> bool:
+def save_clubs(clubs_list) -> bool:
+    env = os.getenv('FLASK_ENV', 'production')
+    file_path = 'data/production/clubs.json' if env == 'production' \
+        else 'data/test/clubs_test.json'
+
     try:
         with open(file_path, 'w') as c:
             json.dump({"clubs": clubs_list}, c, indent=4)
@@ -31,7 +43,10 @@ def save_clubs(clubs_list, file_path='clubs.json') -> bool:
         return False  # Returns False if an error occurs
 
 
-def save_competitions(competitions_list, file_path='competitions.json') -> bool:
+def save_competitions(competitions_list) -> bool:
+    env = os.getenv('FLASK_ENV', 'production')
+    file_path = 'data/production/competitions.json' if env == 'production' \
+        else 'data/test/competitions_test.json'
     try:
         with open(file_path, 'w') as c:
             json.dump({"competitions": competitions_list}, c, indent=4)
@@ -39,28 +54,3 @@ def save_competitions(competitions_list, file_path='competitions.json') -> bool:
     except IOError as e:
         print(f"Error saving to {file_path}: {e}")
         return False  # Returns False if an error occurs
-
-# -------------------------------------------------------
-# Originals Functions
-# -------------------------------------------------------
-
-# def loadClubs():
-#     with open('clubs.json') as c:
-#         list_of_clubs = json.load(c)['clubs']
-#         return list_of_clubs
-#
-#
-# def loadCompetitions():
-#     with open('competitions.json') as comps:
-#         list_of_competitions = json.load(comps)['competitions']
-#         return list_of_competitions
-#
-#
-# def save_clubs(club_list):
-#     with open('clubs.json', 'w') as c:
-#         json.dump({"clubs": club_list}, c, indent=4)
-#
-#
-# def save_competitions(competition_list):
-#     with open('competitions.json', 'w') as comps:
-#         json.dump({"competitions": competition_list}, comps, indent=4)
