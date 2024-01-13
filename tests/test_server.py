@@ -1,4 +1,3 @@
-import server
 from constants import EMAIL_NOT_FOUND_ERROR
 from constants import EMAIL_EMPTY_ERROR
 from constants import BOOKING_COMPLETE_MESSAGE
@@ -15,6 +14,8 @@ from constants import SAVE_CHANGES_MESSAGE_ERROR
 from constants import COMPETITION_FULL_MESSAGE
 from constants import ERROR_MESSAGE_RETRY
 from constants import INVALID_POINTS_MESSAGE
+
+
 # -------------------------------------------------------
 # Tests for flow
 # -------------------------------------------------------
@@ -594,7 +595,7 @@ def test_invalid_points_handling(client, mocker, mock_save_clubs, mock_save_comp
         'competition': "Test Competition",
         'club': "Test Club",
         'places': "5"
-    }, follow_redirects=True)
+    }, follow_redirects = True)
 
     assert response.status_code == 200
     assert INVALID_POINTS_MESSAGE.encode() in response.data
@@ -626,7 +627,7 @@ def test_invalid_places_handling(client, mocker, mock_save_clubs, mock_save_comp
         'competition': "Test Competition",
         'club': "Test Club",
         'places': "5"
-    }, follow_redirects=True)
+    }, follow_redirects = True)
 
     assert response.status_code == 200
     assert "Invalid number of places".encode() in response.data
@@ -706,7 +707,7 @@ def test_book_club_or_competition_not_found(client, mocker, mock_load_clubs, moc
     mocker.patch('server.loadCompetitions', return_value = mock_load_competitions)
 
     # Attempt to book for a club and competition that do not exist in the mock data.
-    response = client.get(f'/book/{nonexisting_club_name}/{nonexisting_club_name}', follow_redirects = True)
+    response = client.get(f'/book/{nonexisting_competition_name}/{nonexisting_club_name}', follow_redirects = True)
 
     # Check that the response is a redirect to the welcome page with an error message.
     assert response.status_code == 200
