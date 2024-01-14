@@ -12,18 +12,6 @@ def client():
 
 
 @pytest.fixture
-def test_clubs():
-    # Provides a set of test data for clubs.
-    return [
-        {
-            "name": "Test Club",
-            "email": "testclubmail@example.co",
-            "points": "10"
-        }
-    ]
-
-
-@pytest.fixture
 def mock_load_clubs():
     # Mocks the loadClubs function.
     return [
