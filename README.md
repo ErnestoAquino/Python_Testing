@@ -1,51 +1,110 @@
+
 # gudlift-registration
 
-1. Why
+## Why
+This is a proof of concept (POC) project to demonstrate a lightweight version of our competition booking platform. The goal is to keep things as lightweight as possible and use user feedback to iterate.
 
+## Getting Started
+This project uses the following technologies:
+- Python v3.x+
+- Flask
 
-    This is a proof of concept (POC) project to show a light-weight version of our competition booking platform. The aim is the keep things as light as possible, and use feedback from the users to iterate.
+While Django does a lot for us by default, Flask allows us to add only what we need.
 
-2. Getting Started
+### Virtual Environment
+This ensures you can install the correct packages without interfering with Python on your machine. Please make sure you have this installed globally before starting.
 
-    This project uses the following technologies:
+## Installation
+First, clone the repository with the command:
 
-    * Python v3.x+
+```bash
+git clone https://github.com/ErnestoAquino/Python_Testing.git
+```
 
-    * [Flask](https://flask.palletsprojects.com/en/1.1.x/)
+Navigate to the folder:
 
-        Whereas Django does a lot of things for us out of the box, Flask allows us to add only what we need. 
-     
+```bash
+cd Python_Testing
+```
 
-    * [Virtual environment](https://virtualenv.pypa.io/en/stable/installation.html)
+Create a virtual environment:
 
-        This ensures you'll be able to install the correct packages without interfering with Python on your machine.
+```bash
+python3 -m venv env
+```
 
-        Before you begin, please ensure you have this installed globally. 
+Activate the virtual environment:
 
+```bash
+source env/bin/activate
+```
 
-3. Installation
+Install the requirements:
 
-    - After cloning, change into the directory and type <code>virtualenv .</code>. This will then set up a a virtual python environment within that directory.
+```bash
+pip install -r requirements.txt
+```
 
-    - Next, type <code>source bin/activate</code>. You should see that your command prompt has changed to the name of the folder. This means that you can install packages in here without affecting affecting files outside. To deactivate, type <code>deactivate</code>
+Set the Environment Variable:
 
-    - Rather than hunting around for the packages you need, you can install in one step. Type <code>pip install -r requirements.txt</code>. This will install all the packages listed in the respective file. If you install a package, make sure others know by updating the requirements.txt file. An easy way to do this is <code>pip freeze > requirements.txt</code>
+```bash
+export FLASK_APP=server.py
+```
 
-    - Flask requires that you set an environmental variable to the python file. However you do that, you'll want to set the file to be <code>server.py</code>. Check [here](https://flask.palletsprojects.com/en/1.1.x/quickstart/#a-minimal-application) for more details
+Now you can run the application with the command:
 
-    - You should now be ready to test the application. In the directory, type either <code>flask run</code> or <code>python -m flask run</code>. The app should respond with an address you should be able to go to using your browser.
+```bash
+flask run
+```
 
-4. Current Setup
+## Current Setup
+The application is powered by JSON files. This is to avoid having a database until we actually need one. The main ones are:
+- `competitions.json` - list of competitions
+- `clubs.json` - list of clubs with relevant information. You can check here which email addresses the application will accept for login.
 
-    The app is powered by [JSON files](https://www.tutorialspoint.com/json/json_quick_guide.htm). This is to get around having a DB until we actually need one. The main ones are:
-     
-    * competitions.json - list of competitions
-    * clubs.json - list of clubs with relevant information. You can look here to see what email addresses the app will accept for login.
+### Viewing Club Points
+To check the available points of clubs, you do not need to be logged in. You can access the following route:
 
-5. Testing
+```bash
+/club-points
+```
 
-    You are free to use whatever testing framework you like-the main thing is that you can show what tests you are using.
+## Testing
+You can run the tests with the following command:
 
-    We also like to show how well we're testing, so there's a module called 
-    [coverage](https://coverage.readthedocs.io/en/coverage-5.1/) you should add to your project.
+```bash
+pytest --cov=.
+```
 
+To generate a report, you can use the following command:
+
+```bash
+pytest --cov=. --cov-report html
+```
+
+This will generate a folder called `htmlcov`. You can open the `index.html` file to view the results.
+
+## Performance Tests
+The performance test uses two json files with test data so as not to affect the real json files during the test.
+
+To run the performance test, you need to make sure the server is stopped and set the environment variable:
+
+```bash
+export FLASK_ENV=testing
+```
+
+Now restart the application:
+
+```bash
+flask run
+```
+
+In another terminal, go to the Python_Testing repository folder and run the script using the following command:
+
+```bash
+locust -f tests/performances_tests
+```
+
+You can open the web interface and configure 6 users, run the test for 3 minutes in the run time field, and start the test.
+
+Once the test is finished, you can stop locust with ctrl + c and view the results.
