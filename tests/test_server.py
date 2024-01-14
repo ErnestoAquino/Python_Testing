@@ -70,38 +70,47 @@ def test_integration_flow(client, mocker, mock_load_clubs, mock_load_competition
 # Tests for showSummary Function
 # -------------------------------------------------------
 
-def test_show_summary_with_valid_email(client, test_clubs, mocker):
-    # Test: Show summary page with a valid email. The page should load successfully and display a welcome message.
-    mocker.patch('server.loadClubs', return_value=test_clubs)
-    valid_email = test_clubs[0]['email']
-    print(valid_email)
-    response = client.post('/showSummary', data={'email': valid_email})
+def test_show_summary_with_valid_email(client, mocker, mock_load_clubs, mock_load_competitions):
+    # Test: Show summary page with a valid email.
+    mocker.patch('server.loadClubs', return_value=mock_load_clubs)
+    mocker.patch('server.loadCompetitions', return_value=mock_load_competitions)
+
+    valid_email = "testclubmail@example.co"
+
+    response = client.post('/showSummary', data={'email': valid_email}, follow_redirects=True)
     assert response.status_code == 200
-    assert b'Welcome' in response.data
+    assert valid_email.encode() in response.data
 
 
-def test_show_summary_with_invalid_email(client):
-    # Test: Attempt to show summary page with an invalid email. This should still return a 200 status code but show
-    # an email not found error.
+def test_show_summary_with_invalid_email(client, mocker, mock_load_clubs, mock_load_competitions):
+    # Test: Attempt to show summary page with an invalid email.
+    mocker.patch('server.loadClubs', return_value=mock_load_clubs)
+    mocker.patch('server.loadCompetitions', return_value=mock_load_competitions)
+
     invalid_email = "noexistingemail@example.com"
+
     response = client.post('/showSummary', data={'email': invalid_email}, follow_redirects=True)
     assert response.status_code == 200
     assert EMAIL_NOT_FOUND_ERROR.encode() in response.data
 
 
-def test_show_summary_with_empty_email(client):
-    # Test: Attempt to show summary page with an empty email field. This should return a 200 status code and show an
-    # error for empty email.
+def test_show_summary_with_empty_email(client, mocker, mock_load_clubs, mock_load_competitions):
+    # Test: Attempt to show summary page with an empty email field.
+    mocker.patch('server.loadClubs', return_value=mock_load_clubs)
+    mocker.patch('server.loadCompetitions', return_value=mock_load_competitions)
+
     response = client.post('/showSummary', data={'email': ''}, follow_redirects=True)
+
     assert response.status_code == 200
     assert EMAIL_EMPTY_ERROR.encode() in response.data
 
 
-def test_show_summary_with_loading_error(client, mocker, test_clubs):
+def test_show_summary_with_loading_error(client, mocker):
     # Test: Simulate an error in loading clubs or competitions data. This should show a loading error message.
     mocker.patch('server.loadClubs', return_value=[])  # Simulates that the loading of clubs data fails
     mocker.patch('server.loadCompetitions', return_value=[])  # Simulates that the loading of competitions data fails
-    valid_email = test_clubs[0]['email']
+
+    valid_email = "testclubmail@example.co"
 
     response = client.post('/showSummary', data={'email': valid_email}, follow_redirects=True)
 
@@ -625,20 +634,24 @@ def test_invalid_places_handling(client, mocker, mock_load_clubs, mock_save_club
 # -------------------------------------------------------
 
 
-def test_club_points_page_loads(client, mocker, test_clubs):
+def test_club_points_page_loads(client, mocker, mock_load_clubs):
     # Test: Verify that the club points page loads successfully.
-    mocker.patch('server.loadClubs', return_value=test_clubs)
+    mocker.patch('server.loadClubs', return_value=mock_load_clubs)
+
     response = client.get('/club-points')
 
     assert response.status_code == 200
     assert b"Club Points" in response.data
 
 
-def test_club_points_display(client, mocker, test_clubs):
+def test_club_points_display(client, mocker, mock_load_clubs):
     # Test: Verify that the club points are correctly displayed on the page.
-    mocker.patch('server.loadClubs', return_value=test_clubs)
+    mocker.patch('server.loadClubs', return_value=mock_load_clubs)
+    clubs = mock_load_clubs
+
     response = client.get('/club-points')
-    for club in test_clubs:
+
+    for club in clubs:
         assert club['name'].encode() in response.data
         assert club['points'].encode() in response.data
 
