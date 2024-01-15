@@ -11,7 +11,7 @@ def loadClubs():
         with open(file_path, 'r') as c:
             list_of_clubs = json.load(c)['clubs']
             return list_of_clubs
-    except(FileNotFoundError, json.decoder.JSONDecodeError) as e:
+    except (FileNotFoundError, json.decoder.JSONDecodeError) as e:
         print(f"Error loading {file_path}: {e}")
         return []  # Return an empty list in case of error.
 
@@ -24,7 +24,7 @@ def loadCompetitions():
         with open(file_path, 'r') as c:
             list_of_competitions = json.load(c)['competitions']
             return list_of_competitions
-    except(FileNotFoundError, json.decoder.JSONDecodeError) as e:
+    except (FileNotFoundError, json.decoder.JSONDecodeError) as e:
         print(f"Error loading {file_path}: {e}")
         return []  # Return an empty list in case of error.
 
