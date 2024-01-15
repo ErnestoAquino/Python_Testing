@@ -8,8 +8,16 @@ This is a proof of concept (POC) project to demonstrate a lightweight version of
 This project uses the following technologies:
 - Python v3.x+
 - Flask
+-  pytest
+- locust
+- flake8
+- coverage
+
 
 While Django does a lot for us by default, Flask allows us to add only what we need.
+### Naming Convention
+
+In this project, we follow the snake_case naming convention.
 
 ### Virtual Environment
 This ensures you can install the correct packages without interfering with Python on your machine. Please make sure you have this installed globally before starting.
