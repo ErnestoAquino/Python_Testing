@@ -67,7 +67,7 @@ def test_integration_flow(client, mocker, mock_load_clubs, mock_load_competition
 
 
 # -------------------------------------------------------
-# Tests for showSummary Function
+# Tests for show_summary Function
 # -------------------------------------------------------
 
 def test_show_summary_with_valid_email(client, mocker, mock_load_clubs, mock_load_competitions):
@@ -119,7 +119,7 @@ def test_show_summary_with_loading_error(client, mocker):
 
 
 # -------------------------------------------------------
-# Tests for purchasePlaces Function
+# Tests for purchase_places Function
 # -------------------------------------------------------
 
 def test_purchase_places_valid_and_confirmation_message(client, mocker, mock_load_clubs, mock_load_competitions):
@@ -370,7 +370,7 @@ def test_purchase_places_with_invalid_competition_date_format(client, mocker, mo
 
 
 # -------------------------------------------------------
-# Tests for purchasePlaces Function: Bug point update fix
+# Tests for purchase_places Function: Bug point update fix
 # -------------------------------------------------------
 
 

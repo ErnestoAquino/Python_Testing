@@ -36,7 +36,7 @@ def index():
 
 
 @app.route('/showSummary', methods=['POST'])
-def showSummary():
+def show_summary():
     email = request.form.get('email')
     clubs = load_clubs()
     competitions = load_competitions()
@@ -76,7 +76,7 @@ def book(competition, club):
 
 
 @app.route('/purchasePlaces', methods=['POST'])
-def purchasePlaces():
+def purchase_places():
     clubs = load_clubs()
     competitions = load_competitions()
 
