@@ -2,7 +2,7 @@ import os
 import json
 
 
-def loadClubs():
+def load_clubs():
     env = os.getenv('FLASK_ENV', 'production')
     file_path = 'data/production/clubs.json' if env == 'production' \
         else 'data/test/clubs_test.json'
@@ -16,7 +16,7 @@ def loadClubs():
         return []  # Return an empty list in case of error.
 
 
-def loadCompetitions():
+def load_competitions():
     env = os.getenv('FLASK_ENV', 'production')
     file_path = 'data/production/competitions.json' if env == 'production' \
         else 'data/test/competitions_test.json'

@@ -1,12 +1,12 @@
 import json
-from data_access import loadClubs
-from data_access import loadCompetitions
+from data_access import load_clubs
+from data_access import load_competitions
 from data_access import save_clubs
 from data_access import save_competitions
 
 
 # -------------------------------------------------------
-# Tests for loadClubs Function
+# Tests for load_clubs Function
 # -------------------------------------------------------
 def test_load_clubs_success(mocker):
     # Test: Verify successful loading of club data from a file.
@@ -20,7 +20,7 @@ def test_load_clubs_success(mocker):
 
     # Mock for the file
     mocker.patch("builtins.open", mocker.mock_open(read_data=json.dumps(mock_clubs_data)))
-    clubs = loadClubs()
+    clubs = load_clubs()
 
     assert clubs == mock_clubs_data["clubs"]
 
@@ -30,7 +30,7 @@ def test_load_clubs_file_not_found_return_empty_list(mocker):
 
     mocker.patch("builtins.open", side_effect=FileNotFoundError)  # Simulate that the file does not exist
     expected_result = []  # Expected result
-    clubs = loadClubs()
+    clubs = load_clubs()
 
     assert clubs == expected_result  # Verify against the expected result
 
@@ -41,13 +41,13 @@ def test_load_clubs_json_decode_error_returns_empty_list(mocker):
     mocker.patch("builtins.open",
                  mocker.mock_open(read_data="This is not JSON"))  # Mock for a file with invalid content
     expected_result = []  # Expected result
-    clubs = loadClubs()
+    clubs = load_clubs()
 
     assert clubs == expected_result  # Verify against the expected result
 
 
 # -------------------------------------------------------
-# Tests for loadCompetitions Function
+# Tests for load_competitions Function
 # -------------------------------------------------------
 def test_load_competitions_success(mocker):
     # Test: Verify successful loading of competition data from a file.
@@ -61,7 +61,7 @@ def test_load_competitions_success(mocker):
 
     # Mock for the file
     mocker.patch("builtins.open", mocker.mock_open(read_data=json.dumps(mock_competitions_data)))
-    competitions = loadCompetitions()
+    competitions = load_competitions()
 
     assert competitions == mock_competitions_data["competitions"]
 
@@ -71,7 +71,7 @@ def test_load_competitions_file_not_found_return_empty_list(mocker):
 
     mocker.patch("builtins.open", side_effect=FileNotFoundError)  # Simulate that the file does not exist
     expected_result = []  # Expected result
-    competitions = loadCompetitions()
+    competitions = load_competitions()
 
     assert competitions == expected_result  # Verify against the expected result
 
@@ -82,7 +82,7 @@ def test_load_competitions_json_decode_error_return_empty_list(mocker):
     mocker.patch("builtins.open",
                  mocker.mock_open(read_data="This is not JSON"))  # Mock for a file with invalid content
     expected_result = []  # Expected result
-    competitions = loadCompetitions()
+    competitions = load_competitions()
 
     assert competitions == expected_result  # Verify against the expected result
 

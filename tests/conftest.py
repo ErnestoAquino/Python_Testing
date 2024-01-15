@@ -13,7 +13,7 @@ def client():
 
 @pytest.fixture
 def mock_load_clubs():
-    # Mocks the loadClubs function.
+    # Mocks the load_clubs function.
     return [
         {
             "name": "Test Club",
@@ -25,7 +25,7 @@ def mock_load_clubs():
 
 @pytest.fixture
 def mock_load_competitions():
-    # Mocks the loadCompetitions function.
+    # Mocks the load_competitions function.
     return [
         {
             "name": "Test Competition",

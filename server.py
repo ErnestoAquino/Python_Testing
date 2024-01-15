@@ -21,8 +21,8 @@ from constants import ERROR_MESSAGE_RETRY
 from utils import parse_competition_date
 from utils import is_competition_past
 
-from data_access import loadClubs
-from data_access import loadCompetitions
+from data_access import load_clubs
+from data_access import load_competitions
 from data_access import save_clubs
 from data_access import save_competitions
 
@@ -38,8 +38,8 @@ def index():
 @app.route('/showSummary', methods=['POST'])
 def showSummary():
     email = request.form.get('email')
-    clubs = loadClubs()
-    competitions = loadCompetitions()
+    clubs = load_clubs()
+    competitions = load_competitions()
 
     # Verify if the clubs and competitions data were loaded correctly
     if not clubs or not competitions:
@@ -61,8 +61,8 @@ def showSummary():
 
 @app.route('/book/<competition>/<club>')
 def book(competition, club):
-    clubs = loadClubs()
-    competitions = loadCompetitions()
+    clubs = load_clubs()
+    competitions = load_competitions()
 
     # Search for the corresponding competition and club
     found_club = next((c for c in clubs if c['name'] == club), None)
@@ -77,8 +77,8 @@ def book(competition, club):
 
 @app.route('/purchasePlaces', methods=['POST'])
 def purchasePlaces():
-    clubs = loadClubs()
-    competitions = loadCompetitions()
+    clubs = load_clubs()
+    competitions = load_competitions()
 
     # Verify if the clubs and competitions were loaded correctly.
     if not clubs or not competitions:
@@ -174,7 +174,7 @@ def purchasePlaces():
 
 @app.route('/club-points')
 def club_points():
-    clubs = loadClubs()
+    clubs = load_clubs()
     if not clubs:
         flash(LOADING_MESSAGE_ERROR)
         return redirect(url_for('index'))
