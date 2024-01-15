@@ -35,7 +35,7 @@ def index():
     return render_template('index.html')
 
 
-@app.route('/showSummary', methods=['POST'])
+@app.route('/show-summary', methods=['POST'])
 def show_summary():
     email = request.form.get('email')
     clubs = load_clubs()
@@ -75,7 +75,7 @@ def book(competition, club):
         return render_template('welcome.html', club=club, competition=competitions)
 
 
-@app.route('/purchasePlaces', methods=['POST'])
+@app.route('/purchase-places', methods=['POST'])
 def purchase_places():
     clubs = load_clubs()
     competitions = load_competitions()

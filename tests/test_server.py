@@ -41,16 +41,16 @@ def test_integration_flow(client, mocker, mock_load_clubs, mock_load_competition
     response = client.get('/')
     assert response.status_code == 200
 
-    # showSummary: POST request
-    response = client.post('/showSummary', data={'email': existing_mail})
+    # show-summary: POST request
+    response = client.post('/show-summary', data={'email': existing_mail})
     assert response.status_code == 200
 
     # book: GET request to the booking route for a specific club and competition
     response = client.get(f'/book/{existing_competition}/{existing_club}')
     assert response.status_code == 200
 
-    # purchasePlaces: POST request to make a purchase
-    response = client.post('/purchasePlaces', data={
+    # purchase-places: POST request to make a purchase
+    response = client.post('/purchase-places', data={
         'competition': "Test Competition",
         'club': "Test Club",
         'places': "5"
@@ -77,7 +77,7 @@ def test_show_summary_with_valid_email(client, mocker, mock_load_clubs, mock_loa
 
     valid_email = "testclubmail@example.co"
 
-    response = client.post('/showSummary', data={'email': valid_email}, follow_redirects=True)
+    response = client.post('/show-summary', data={'email': valid_email}, follow_redirects=True)
     assert response.status_code == 200
     assert valid_email.encode() in response.data
 
@@ -89,7 +89,7 @@ def test_show_summary_with_invalid_email(client, mocker, mock_load_clubs, mock_l
 
     invalid_email = "noexistingemail@example.com"
 
-    response = client.post('/showSummary', data={'email': invalid_email}, follow_redirects=True)
+    response = client.post('/show-summary', data={'email': invalid_email}, follow_redirects=True)
     assert response.status_code == 200
     assert EMAIL_NOT_FOUND_ERROR.encode() in response.data
 
@@ -99,7 +99,7 @@ def test_show_summary_with_empty_email(client, mocker, mock_load_clubs, mock_loa
     mocker.patch('server.load_clubs', return_value=mock_load_clubs)
     mocker.patch('server.load_competitions', return_value=mock_load_competitions)
 
-    response = client.post('/showSummary', data={'email': ''}, follow_redirects=True)
+    response = client.post('/show-summary', data={'email': ''}, follow_redirects=True)
 
     assert response.status_code == 200
     assert EMAIL_EMPTY_ERROR.encode() in response.data
@@ -112,7 +112,7 @@ def test_show_summary_with_loading_error(client, mocker):
 
     valid_email = "testclubmail@example.co"
 
-    response = client.post('/showSummary', data={'email': valid_email}, follow_redirects=True)
+    response = client.post('/show-summary', data={'email': valid_email}, follow_redirects=True)
 
     assert response.status_code == 200
     assert LOADING_MESSAGE_ERROR.encode() in response.data
@@ -129,7 +129,7 @@ def test_purchase_places_valid_and_confirmation_message(client, mocker, mock_loa
     mocker.patch('server.save_clubs')
     mocker.patch('server.save_competitions')
 
-    response = client.post('/purchasePlaces', data={
+    response = client.post('/purchase-places', data={
         'competition': "Test Competition",
         'club': "Test Club",
         'places': "5"
@@ -158,7 +158,7 @@ def test_purchase_places_with_insufficient_points(client, mocker, mock_load_comp
     mocker.patch('server.save_clubs')
     mocker.patch('server.save_competitions')
 
-    response = client.post('/purchasePlaces', data={
+    response = client.post('/purchase-places', data={
         'competition': "Test Competition",
         'club': "Test Club",
         'places': "5"
@@ -183,7 +183,7 @@ def test_purchase_places_when_insufficient_places(client, mocker, mock_load_club
     mocker.patch('server.save_clubs')
     mocker.patch('server.save_competitions')
 
-    response = client.post('/purchasePlaces', data={
+    response = client.post('/purchase-places', data={
         'competition': "Test Competition",
         'club': "Test Club",
         'places': "5"  # More places than are available
@@ -202,7 +202,7 @@ def test_purchase_places_invalid_number_of_places(client, mocker, mock_load_club
 
     invalid_places = "invalid"  # Invalid value for the number of places
 
-    response = client.post('/purchasePlaces', data={
+    response = client.post('/purchase-places', data={
         'competition': "Test Competition",
         'club': "Test Club",
         'places': invalid_places
@@ -219,7 +219,7 @@ def test_purchase_places_zero_places(client, mocker, mock_load_clubs, mock_load_
     mocker.patch('server.save_clubs')
     mocker.patch('server.save_competitions')
 
-    response = client.post('/purchasePlaces', data={
+    response = client.post('/purchase-places', data={
         'competition': "Test Competition",
         'club': "Test Club",
         'places': "0"
@@ -236,7 +236,7 @@ def test_purchase_places_negative_places(client, mocker, mock_load_clubs, mock_l
     mocker.patch('server.save_clubs')
     mocker.patch('server.save_competitions')
 
-    response = client.post('/purchasePlaces', data={
+    response = client.post('/purchase-places', data={
         'competition': "Test Competition",
         'club': "Test Club",
         'places': "-1"
@@ -253,7 +253,7 @@ def test_purchase_places_no_club_found(client, mocker, mock_load_clubs, mock_loa
     mocker.patch('server.save_clubs')
     mocker.patch('server.save_competitions')
 
-    response = client.post('/purchasePlaces', data={
+    response = client.post('/purchase-places', data={
         'competition': "Test Competition",
         'club': "Nonexistent Club",
         'places': "5"
@@ -270,7 +270,7 @@ def test_purchase_places_no_competition_found(client, mocker, mock_load_clubs, m
     mocker.patch('server.save_clubs')
     mocker.patch('server.save_competitions')
 
-    response = client.post('/purchasePlaces', data={
+    response = client.post('/purchase-places', data={
         'competition': "Nonexistent Competition",
         'club': "Test Club",
         'places': "5"
@@ -287,7 +287,7 @@ def test_purchase_places_exceeding_place_limit(client, mocker, mock_load_clubs, 
     mocker.patch('server.save_clubs')
     mocker.patch('server.save_competitions')
 
-    response = client.post('/purchasePlaces', data={
+    response = client.post('/purchase-places', data={
         'competition': "Test Competition",
         'club': "Test Club",
         'places': "13"  # Attempting to book more than 12 places
@@ -311,7 +311,7 @@ def test_purchase_places_with_future_competition(client, mocker, mock_load_clubs
     mocker.patch('server.save_clubs')
     mocker.patch('server.save_competitions')
 
-    response = client.post('/purchasePlaces', data={
+    response = client.post('/purchase-places', data={
         'competition': "Test Competition",
         'club': "Test Club",
         'places': "1"
@@ -335,7 +335,7 @@ def test_purchase_places_with_past_competition(client, mocker, mock_load_clubs):
     mocker.patch('server.save_clubs')
     mocker.patch('server.save_competitions')
 
-    response = client.post('/purchasePlaces', data={
+    response = client.post('/purchase-places', data={
         'competition': "Test Competition",
         'club': "Test Club",
         'places': "1"
@@ -359,7 +359,7 @@ def test_purchase_places_with_invalid_competition_date_format(client, mocker, mo
     mocker.patch('server.save_clubs')
     mocker.patch('server.save_competitions')
 
-    response = client.post('/purchasePlaces', data={
+    response = client.post('/purchase-places', data={
         'competition': "Test Competition",
         'club': "Test Club",
         'places': "1"
@@ -402,7 +402,7 @@ def test_correct_point_deduction(client, mocker, mock_save_clubs, mock_save_comp
     mocker.patch('server.save_competitions', mock_save_competitions)
 
     # Perform the POST request
-    response = client.post('/purchasePlaces', data={
+    response = client.post('/purchase-places', data={
         'competition': "Test Competition",
         'club': "Test Club",
         'places': str(places_to_purchase)
@@ -443,7 +443,7 @@ def test_no_point_deduction_for_invalid_purchase(client, mocker, mock_save_clubs
     mocker.patch('server.save_competitions', mock_save_competitions)
 
     # Perform the POST request
-    response = client.post('/purchasePlaces', data={
+    response = client.post('/purchase-places', data={
         'competition': "Test Competition",
         'club': "Test Club",
         'places': str(places_to_purchase)
@@ -484,7 +484,7 @@ def test_point_deduction_for_max_place_purchase(client, mocker, mock_save_clubs,
     mocker.patch('server.save_competitions', mock_save_competitions)
 
     # Perform the POST request to purchase the maximum number of places
-    response = client.post('/purchasePlaces', data={
+    response = client.post('/purchase-places', data={
         'competition': "Test Competition",
         'club': "Test Club",
         'places': str(max_places_to_purchase)
@@ -522,7 +522,7 @@ def test_save_error_handling_places(client, mocker, mock_save_clubs_fail, mock_s
     mocker.patch('server.save_clubs', mock_save_clubs_fail)
     mocker.patch('server.save_competitions', mock_save_competitions_fail)
 
-    response = client.post('/purchasePlaces', data={
+    response = client.post('/purchase-places', data={
         'competition': "Test Competition",
         'club': "Test Club",
         'places': "5"
@@ -550,7 +550,7 @@ def test_purchase_places_competition_full(client, mocker, mock_load_clubs):
     mocker.patch('server.save_competitions')
 
     # Perform POST request to try purchasing places in the full competition
-    response = client.post('/purchasePlaces', data={
+    response = client.post('/purchase-places', data={
         "competition": "Full Competition",
         "club": "Test Club",
         "places": "1"
@@ -567,7 +567,7 @@ def test_load_error_handling(client, mocker):
     mocker.patch('server.load_competitions', return_value=[])
 
     # Perform a POST request that would normally trigger the loading
-    response = client.post('/purchasePlaces', data={
+    response = client.post('/purchase-places', data={
         "competition": "Some Competition",
         "club": "Some Club",
         "places": "1"
@@ -593,7 +593,7 @@ def test_invalid_points_handling(client, mocker, mock_load_competitions, mock_sa
     mocker.patch('server.save_clubs')
     mocker.patch('server.save_competitions')
 
-    response = client.post('/purchasePlaces', data={
+    response = client.post('/purchase-places', data={
         'competition': "Test Competition",
         'club': "Test Club",
         'places': "5"
@@ -619,7 +619,7 @@ def test_invalid_places_handling(client, mocker, mock_load_clubs, mock_save_club
     mocker.patch('server.save_clubs')
     mocker.patch('server.save_competitions')
 
-    response = client.post('/purchasePlaces', data={
+    response = client.post('/purchase-places', data={
         'competition': "Test Competition",
         'club': "Test Club",
         'places': "5"

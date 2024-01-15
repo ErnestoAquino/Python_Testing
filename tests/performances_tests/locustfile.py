@@ -15,7 +15,7 @@ class ClubUserBehavior(TaskSet):
 
     @task
     def show_summary(self):
-        self.client.post("/showSummary", {"email": "contact@highflyers.com"})
+        self.client.post("/show-summary", {"email": "contact@highflyers.com"})
 
     @task
     def book_competition(self):
@@ -23,7 +23,7 @@ class ClubUserBehavior(TaskSet):
 
     @task
     def purchase_places(self):
-        self.client.post("/purchasePlaces", {
+        self.client.post("/purchase-places", {
             "competition": "Test Championship",
             "club": "High Flyers",
             "places": "1"
