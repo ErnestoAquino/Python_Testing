@@ -297,13 +297,76 @@ def test_purchase_places_exceeding_place_limit(client, mocker, mock_load_clubs, 
     assert MAX_PLACES_PER_BOOKING_MESSAGE.encode() in response.data
 
 
+def test_purchase_places_exceeding_remaining_limit(client, mocker, mock_load_clubs):
+    # Test: Attempt to purchase places exceeding the remaining limit for a club in a competition.
+    mock_competitions_with_existing_bookings = [
+        {
+            "name": "Test Competition",
+            "date": "2050-10-22 13:30:00",
+            "numberOfPlaces": "25",
+            "bookings": {"Test Club": 10}  # 10 places already booked by 'Test Club'
+        }
+    ]
+    mocker.patch('server.load_clubs', return_value=mock_load_clubs)
+    mocker.patch('server.load_competitions', return_value=mock_competitions_with_existing_bookings)
+    mocker.patch('server.save_clubs')
+    mocker.patch('server.save_competitions')
+
+    # Attempt to book more places than allowed
+    response = client.post('/purchase-places', data={
+        'competition': "Test Competition",
+        'club': "Test Club",
+        'places': "3"  # Trying to book 3 more places, which exceeds the limit of 12
+    }, follow_redirects=True)
+
+    remaining_places_limit = 2  # 12 - 10 existing bookings
+    expected_message = f"You can only book {remaining_places_limit} more place(s) for this competition."
+
+    assert response.status_code == 200
+    assert expected_message.encode() in response.data
+
+
+def test_purchase_places_with_additional_booking(client, mocker, mock_load_clubs):
+    # Test: Verify the server's handling of additional booking requests for a club that has already booked some
+    # places in a competition.
+    mock_competitions_with_existing_bookings = [
+        {
+            "name": "Test Competition",
+            "date": "2050-10-22 13:30:00",
+            "numberOfPlaces": "25",
+            "bookings": {"Test Club": 2}  # 2 places already booked by 'Test Club'
+        }
+    ]
+
+    mocker.patch('server.load_clubs', return_value=mock_load_clubs)
+    mocker.patch('server.load_competitions', return_value=mock_competitions_with_existing_bookings)
+    mocker.patch('server.save_clubs')
+    mocker.patch('server.save_competitions')
+
+    # Attempt to book additional places within the allowed limit
+    response = client.post('/purchase-places', data={
+        'competition': "Test Competition",
+        'club': "Test Club",
+        'places': "3"  # Attempt to book 3 additional places within the limit of 12
+    }, follow_redirects=True)
+
+    expected_confirmation_message = "You have reserved 3 place(s) for the competition Test Competition."
+
+    assert response.status_code == 200
+    assert BOOKING_COMPLETE_MESSAGE.encode() in response.data
+
+    # Check for the presence of the booking confirmation message
+    assert expected_confirmation_message.encode() in response.data
+
+
 def test_purchase_places_with_future_competition(client, mocker, mock_load_clubs):
     # Test: Attempt to purchase places for a competition set in the future.
     future_competition = [
         {
             "name": "Test Competition",
             "date": "2100-10-22 13:30:00",  # Future date
-            "numberOfPlaces": "20"
+            "numberOfPlaces": "20",
+            "bookings": {}
         }
     ]
     mocker.patch('server.load_clubs', return_value=mock_load_clubs)
@@ -369,11 +432,6 @@ def test_purchase_places_with_invalid_competition_date_format(client, mocker, mo
     assert INVALID_DATE_FORMAT_MESSAGE.encode() in response.data
 
 
-# -------------------------------------------------------
-# Tests for purchase_places Function: Bug point update fix
-# -------------------------------------------------------
-
-
 def test_correct_point_deduction(client, mocker, mock_save_clubs, mock_save_competitions):
     # Test: Verify correct point deduction after a club purchases places in a competition.
 
@@ -393,7 +451,8 @@ def test_correct_point_deduction(client, mocker, mock_save_clubs, mock_save_comp
         {
             "name": "Test Competition",
             "date": "2050-10-22 13:30:00",
-            "numberOfPlaces": "20"
+            "numberOfPlaces": "20",
+            "bookings": {}
         }
     ]
     mocker.patch('server.load_clubs', return_value=mock_club)
@@ -474,7 +533,8 @@ def test_point_deduction_for_max_place_purchase(client, mocker, mock_save_clubs,
         {
             "name": "Test Competition",
             "date": "2050-10-22 13:30:00",
-            "numberOfPlaces": "30"  # Sufficient availability of places
+            "numberOfPlaces": "30",  # Sufficient availability of places
+            "bookings": {}
         }
     ]
 
@@ -505,7 +565,8 @@ def test_save_error_handling_places(client, mocker, mock_save_clubs_fail, mock_s
         {
             "name": "Test Competition",
             "date": "2100-10-22 13:30:00",
-            "numberOfPlaces": "15"
+            "numberOfPlaces": "15",
+            "bookings": {}
         }
     ]
 
