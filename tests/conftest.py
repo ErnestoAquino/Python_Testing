@@ -30,7 +30,8 @@ def mock_load_competitions():
         {
             "name": "Test Competition",
             "date": "2030-10-22 13:30:00",
-            "numberOfPlaces": "30"
+            "numberOfPlaces": "30",
+            "bookings": {}
         }
     ]
 
