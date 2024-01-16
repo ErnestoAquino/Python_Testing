@@ -3,7 +3,8 @@
         {
             "name": "Test Championship",
             "date": "2025-05-15 09:00:00",
-            "numberOfPlaces": "9623"
+            "numberOfPlaces": "9623",
+            "bookings": {}
         }
     ]
 }
