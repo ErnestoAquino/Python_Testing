@@ -1,6 +1,7 @@
 from datetime import datetime
-from server import parse_competition_date
-from server import is_competition_past
+from utils import parse_competition_date
+from utils import is_competition_past
+from utils import purchase_limit
 
 
 # -------------------------------------------------------
@@ -83,3 +84,68 @@ def test_competition_same_day_different_hours():
     current_date = datetime(2024, 1, 2, 10, 00, 00)
 
     assert is_competition_past(competition_date, current_date)
+
+
+# -------------------------------------------------------
+# Tests for purchase_limit Function
+# -------------------------------------------------------
+
+def test_purchase_limit_no_previous_booking():
+    # Test: Check the purchase limit for a club without any previous bookings for a competition.
+    selected_club = {
+        "name": "Test Club",
+        "email": "testclubmail@example.co",
+        "points": "10"
+    }
+
+    selected_competition = {
+        "name": "Test Competition",
+        "date": "2030-10-22 13:30:00",
+        "numberOfPlaces": "30",
+        "bookings": {}
+    }
+
+    expected_limit = 12
+    assert purchase_limit(selected_club, selected_competition) == expected_limit
+
+
+def test_purchase_limit_with_previous_booking():
+    # Test: Check the purchase limit for a club with previous bookings for a competition.
+    selected_club = {
+        "name": "Test Club",
+        "email": "testclubmail@example.co",
+        "points": "10"
+    }
+
+    selected_competition = {
+        "name": "Test Competition",
+        "date": "2030-10-22 13:30:00",
+        "numberOfPlaces": "30",
+        "bookings": {
+            "Test Club": 6
+        }
+    }
+
+    expected_limit = 6
+    assert purchase_limit(selected_club, selected_competition) == expected_limit
+
+
+def test_purchase_limit_when_limit_reached():
+    # Test: Check the purchase limit for a club that has reached the maximum booking limit for a competition.
+    selected_club = {
+        "name": "Test Club",
+        "email": "testclubmail@example.co",
+        "points": "10"
+    }
+
+    selected_competition = {
+        "name": "Test Competition",
+        "date": "2030-10-22 13:30:00",
+        "numberOfPlaces": "30",
+        "bookings": {
+            "Test Club": 12
+        }
+    }
+
+    expected_limit = 0
+    assert purchase_limit(selected_club, selected_competition) == expected_limit
