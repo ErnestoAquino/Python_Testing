@@ -20,6 +20,7 @@ from constants import ERROR_MESSAGE_RETRY
 
 from utils import parse_competition_date
 from utils import is_competition_past
+from utils import purchase_limit
 
 from data_access import load_clubs
 from data_access import load_competitions
@@ -115,6 +116,10 @@ def purchase_places():
     # Check that the number of places requested is valid.
     try:
         places_required = int(request.form['places'])
+
+        remaining_places_limit = purchase_limit(selected_club, selected_competition)
+
+        # "Check that the required places are not equal to or less than 0."
         if places_required <= 0:
             flash(NON_POSITIVE_PLACES_MESSAGE)
             return redirect(url_for('book', competition=selected_competition['name'], club=selected_club['name']))
@@ -123,6 +128,12 @@ def purchase_places():
         if places_required > 12:
             flash(MAX_PLACES_PER_BOOKING_MESSAGE)
             return redirect(url_for('book', competition=selected_competition['name'], club=selected_club['name']))
+
+        # "Check that the required places do not exceed the allowed places limit."
+        if places_required > remaining_places_limit:
+            flash(f"You can only book {remaining_places_limit} more place(s) for this competition.")
+            return redirect(url_for('book', competition=selected_competition['name'], club=selected_club['name']))
+
         points_to_use = places_required
     except ValueError:
         flash(INVALID_PLACES_MESSAGE)
@@ -154,6 +165,12 @@ def purchase_places():
         return redirect(url_for('book', competition=selected_competition['name'], club=selected_club['name']))
 
     # If the checks are correct, we update the points and places.
+    club_name = selected_club['name']
+    if club_name in selected_competition['bookings']:
+        selected_competition['bookings'][club_name] += places_required
+    else:
+        selected_competition['bookings'][club_name] = places_required
+
     selected_club['points'] = str(available_points - points_to_use)
     selected_competition['numberOfPlaces'] = str(number_of_places - places_required)
 
