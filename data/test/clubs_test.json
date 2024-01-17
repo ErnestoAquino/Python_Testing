@@ -3,7 +3,27 @@
         {
             "name": "High Flyers",
             "email": "contact@highflyers.com",
-            "points": "9623"
+            "points": "5000"
+        },
+        {
+            "name": "Sky Divers",
+            "email": "info@skydivers.com",
+            "points": "5000"
+        },
+        {
+            "name": "Mountain Climbers",
+            "email": "support@mountainclimbers.com",
+            "points": "5000"
+        },
+        {
+            "name": "Sea Surfers",
+            "email": "contact@seasurfers.com",
+            "points": "5000"
+        },
+        {
+            "name": "Desert Runners",
+            "email": "hello@desertrunners.com",
+            "points": "5000"
         }
     ]
 }
