@@ -3,7 +3,31 @@
         {
             "name": "Test Championship",
             "date": "2025-05-15 09:00:00",
-            "numberOfPlaces": "9623",
+            "numberOfPlaces": "5000",
+            "bookings": {}
+        },
+        {
+            "name": "Summer Sprint",
+            "date": "2026-06-20 10:00:00",
+            "numberOfPlaces": "5000",
+            "bookings": {}
+        },
+        {
+            "name": "Autumn Open",
+            "date": "2026-09-10 08:30:00",
+            "numberOfPlaces": "5000",
+            "bookings": {}
+        },
+        {
+            "name": "Winter Games",
+            "date": "2027-01-05 09:00:00",
+            "numberOfPlaces": "5000",
+            "bookings": {}
+        },
+        {
+            "name": "Spring Challenge",
+            "date": "2023-04-22 07:00:00",
+            "numberOfPlaces": "5000",
             "bookings": {}
         }
     ]
